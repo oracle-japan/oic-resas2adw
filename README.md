@@ -1,6 +1,6 @@
 # Oracle Integration Cloud チュートリアル: RESAS-API のデータを Oracle ADW に保存する
 
-2020年6月
+2022年3月
 
 このチュートリアルは、 Oracle Integration Cloud を使用して [RESAS-API が提供する市区町村データ](https://opendata.resas-portal.go.jp/docs/api/v1/cities.html) を、Oracle ADW 上の `CITIES` という名前の表に保存してみます。
 
@@ -8,22 +8,22 @@
 
 このチュートリアルに沿って作業を進めるためには、次の設定が完了している必要があります。
 
-* Oracle Integration Cloud と Oracle Autononmous Database (ADW) のインスタンス作成
+* Oracle Integration Cloud と Oracle Autononmous Database (ADB) のインスタンス作成
 * 市区町村データを格納する Oracle ADW の表の作成
 * RESAS-API の API キーの取得
 
 ### インスタンスの作成
 
-このチュートリアルは、Oracle Integration Cloud と Oracle ADW のインスタンスの作成が完了し、コンソールにログインていることを前提としています。
+このチュートリアルは、Oracle Integration Cloud と Oracle ADB のインスタンスの作成が完了し、コンソールにログインていることを前提としています。
 まだインスタンスを作成していない場合は、次のページを参照してインスタンスを作成してください。
 
-* [Oracle Integration Cloud インスタンスの作成](https://community.oracle.com/docs/DOC-1037470)
+* [Oracle Integration Cloud インスタンスの作成](https://oracle-japan.github.io/ocitutorials/integration/integration-for-commons-1-instance)
 * Oracle ADW インスタンスの作成
 
 ### 表の作成
 
 このチュートリアルでは、`CITIES` 表を使用します。
-`CITIES` 表には、次の3つの列が定義されています。
+`CITIES` 表には、次の4つの列が定義されています。
 
 | 列名 | データ型 | Null値の指定 | 備考 |
 |:----|:----|:---:|:----|
@@ -52,212 +52,10 @@ API キーは、[利用登録](https://opendata.resas-portal.go.jp/form.html)す
 Oracle Integration Cloud では、使用する API やデータベースなどへのアクセス情報を "接続" として定義します。
 Oracle Integration Cloud は、多数のアダプタを提供しており、アクセスに必要な情報を入力するだけです。
 
-このチュートリアルでは、２つの接続を作成します。
+このチュートリアルでは、作成済みの次の２つの接続を使用します。
 
-* RESAS-API 呼び出すための REST アダプタを使用した接続
-* Oracle ADW アダプタを使用した接続
-
-### RESAS-API 呼び出すための REST アダプタを使用した接続
-
-最初に作成するのは、 RESAS-API を呼び出すための REST アダプタ接続です。
-REST アダプタ接続を作成する手順は次のとおりです。
-
-1.  Oracle Integration Cloud の **「ようこそ」** または **「ホーム」** ページを開いている場合は、ナビゲーション・ペインで **「統合」** をクリックします。
-
-    ![Oracle Integration Cloud](images/ss01-02.png)
-
-    ナビゲーション・ペインに **「統合」** に関連するメニューが表示されます。
-    **「接続」** をクリックします。
-
-    ![Oracle Integration Cloud](images/ss01-03.png)
-
-1.  Oracle Integration Cloud の **「接続」** ページが表示されたら、ページの右上にある **「作成」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss01-04.png)
-
-1.  **「接続の作成 - アダプタの選択」** ボックスが表示されます。
-
-    ![Oracle Integration Cloud](images/ss01-05.png)
-
-1.  **「検索」** フィールドに `REST` と入力して、表示を絞り込みます。
-    表示された **「REST」** アイコンをクリックしてから右下の **「選択」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss01-06.png)
-
-1.  **「接続の作成」** ボックスが表示されます。
-    作成する接続の基本情報を入力します。
-
-    | 入力項目 | 入力する値 |
-    |:----|:----|
-    | **「名前」** | `RESAS-API` |
-    | **「識別子」** | `RESAS-API` （「名前」を入力すると自動的に設定されます） |
-    | **「ロール」** | **「呼び出し」** を選択 |
-
-    ![Oracle Integration Cloud](images/ss01-07.png)
-
-    入力したら右下の **「作成」** ボタンをクリックします。
-
-1.  接続の詳細を入力するページが表示されます。
-    **「接続プロパティ」** セクションでは、次のように値を入力します。
-
-    | 入力項目 | 入力する値 |
-    |:----|:----|
-    | **「接続タイプ」** | **「REST APIベースURL」** を選択 |
-    | **「TLSバージョン」** | 入力しない |
-    | **「接続URL」** | `https://opendata.resas-portal.go.jp/api/v1` |
-
-    ![Oracle Integration Cloud](images/ss01-08.png)
-
-1.  **「セキュリティ」** セクションでは、次のように値を入力します。
-
-    | 入力項目 | 入力する値 |
-    |:----|:----|
-    | **「セキュリティ・ポリシー」** | **「API Key Based Authentication」** を選択 |
-    | **「APIキー」** | RESAS-API から発行された API キーを入力 |
-    | **「APIキーの用途」** | `-H X-API-KEY: ${api-key}` |
-
-    ![Oracle Integration Cloud](images/ss01-09.png)
-
-1.  **「接続プロパティ」** と **「セキュリティ」** セクションの値を入力したら、ページの右上に表示されている **「テスト」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss01-11.png)
-
-    **「接続プロパティ」** で指定した値が正しければ、ページの右上に成功したことを表すメッセージ **「接続 <接続名> が正常にテストされました。」** が表示されます。
-
-1.  テストに成功したら、ページの右上に表示されている **「保存」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss01-12.png)
-
-1.  保存できたら、ページの左上に表示されている **「<」** （戻る）アイコンをクリックして、 **「接続」** ページに戻ります。
-
-    ![Oracle Integration Cloud](images/ss01-13.png)
-
-### Oracle ADW アダプタを使用した接続
-
-#### Oracle ADW のウォレット・ファイルのダウンロード
-
-Oracle ADW のデータベースにアクセスするには、ウォレット・ファイルが必要になります。
-ウォレット・ファイルをダウンロードする手順は次のとおりです。
-
-1.  OCI コンソールにログインします。
-    ページの左側にあるナビゲーション・メニューから **「データベース」** セクションの **「Autonomous Data Warehouse」** を選択します。
-
-1.  使用する ADW インスタンスが作成された **「リージョン」** と **「コンパートメント」** を選択します。
-    使用する ADW インスタンスの表示名をクリックして詳細ページを開きます。
-    **「DB接続」** ボタンをクリックします。
-
-1.  **「DB接続」** ボックスが表示されます。
-    **「ウォレット・タイプ」** では **「インスタンス・ウォレット」** を選択して、 **「ウォレットのダウンロード」** ボタンをクリックします。
-
-1.  **「ウォレットのダウンロード」** ボックスが表示されます。
-    ウォレットのパスワードを指定する必要があります。
-    **「パスワード」** と **「パスワードの確認」** にパスワードを指定します。
-    ここで指定したパスワードは、 Oracle Integration Cloud で接続を作成する際に必要なので、忘れないようにしてください。
-
-    **「ダウンロード」** ボタンをクリックすると、ウォレット・ファイル `wallet_<DB名>.zip` がダウンロードされます。
-
-1.  ダウンロードしたウォレット・ファイル `wallet_<DB名>.zip` に含まれているファイル `tnsnames.ora` を任意のテキスト・エディタで開き、接続に必要なホスト名とサービス名を確認します。
-    `tnsnames.ora` には次のような3つのエントリが記述されています（改行を追加しています）。
-
-    ```txt
-    <DB名>_high = (description=
-        (retry_count=20)
-        (retry_delay=3)
-        (address=(protocol=tcps)(port=1522)(host=xxx.yyy.oraclecloud.com))
-        (connect_data=(service_name=zzzzz_<DB名>_high.adwc.oraclecloud.com))
-        (security=(ssl_server_cert_dn="CN=adwc.uscom-east-1.oraclecloud.com,OU=Oracle BMCS US,O=Oracle Corporation,L=Redwood City,ST=California,C=US")))
-
-    <DB名>_low = (description=
-        (retry_count=20)
-        (retry_delay=3)
-        (address=(protocol=tcps)(port=1522)(host=xxx.yyy.oraclecloud.com))
-        (connect_data=(service_name=zzzzz_<DB名>_low.adwc.oraclecloud.com))
-        (security=(ssl_server_cert_dn="CN=adwc.uscom-east-1.oraclecloud.com,OU=Oracle BMCS US,O=Oracle Corporation,L=Redwood City,ST=California,C=US")))
-
-    <DB名>_medium = (description=
-        (retry_count=20)
-        (retry_delay=3)
-        (address=(protocol=tcps)(port=1522)(host=xxx.yyy.oraclecloud.com))
-        (connect_data=(service_name=zzzzz_<DB名>_medium.adwc.oraclecloud.com))
-        (security=(ssl_server_cert_dn="CN=adwc.uscom-east-1.oraclecloud.com,OU=Oracle BMCS US,O=Oracle Corporation,L=Redwood City,ST=California,C=US")))
-    ```
-
-    ホスト名は、 各エントリ内の `(address=(protocol=tcps)(port=1522)(host=xxx.yyy.oraclecloud.com))` で指定されている `host` の値です。
-    この例では、 `xxx.yyy.oraclecloud.com` です
-    （`xxx.yyy` の部分は、使用するウォレット・ファイル内の `tnsnames.ora` に記述されているものと置き換えてください）。
-
-    サービス名は、次の3つのうちのどれか1つを選択できます:
-    - `<DB名>_high`
-    - `<DB名>_low`
-    - `<DB名>_medium`
-
-    今回は、 `<DB名>_medium` を使用することにします。
-    （`<DB名>` は、使用するウォレット・ファイル内の `tnsnames.ora` に記述されているものと置き換えてください）
-
-#### Oracle Integration Cloud で接続を作成
-
-ウォレット・ファイルをダウンロードし、接続情報を確認できたら、 Oracle Integration Cloud で ADW アダプタを使用した接続を作成します。
-接続を作成する手順は次のとおりです。
-
-1.  Oralce Integration Cloud にログインし、 **「接続」** ページを開きます。
-    **「接続」** ページの右上にある **「作成」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss03-01.png)
-
-1.  **「接続の作成 - アダプタの選択」** ボックスが表示されたら、 **「検索」** フィールドに `ADW` と入力して、表示を絞り込みます。
-
-    ![Oracle Integration Cloud](images/ss03-02.png)
-
-    表示された **「Oracle ADW」** アイコンをクリックしてから右下の **「選択」** ボタンをクリックします。
-
-1.  **「接続の作成」** ボックスが表示されます。
-    作成する接続の基本情報を入力します。
-
-    | 入力項目 | 入力する値 |
-    |:----|:----|
-    | **「名前」** | My ADW |
-    | **「識別子」** | MY_ADW |
-    | **「ロール」** | **「呼び出し」** を選択 |
-
-    ![Oracle Integration Cloud](images/ss03-03.png)
-
-    入力したら右下の **「作成」** ボタンをクリックします。
-
-1.  接続の詳細を入力するページが表示されます。
-    **「接続プロパティ」** セクションでは、次のように値を入力します。
-
-    | 入力項目 | 入力する値 |
-    |:----|:----|
-    | **「Host」** | ウォレット・ファイル内の `tnsnames.ora` から取得したホスト名 |
-    | **「Port」** | 1522 |
-    | **「SID」** | 入力しない |
-    | **「Service Name」** | `<DB名>_medium` （`<DB名>` は、使用する環境のものと置き換えてください） |
-
-    ![Oracle Integration Cloud](images/ss03-04.png)
-
-1.  **「セキュリティ」** セクションでは、次のように値を入力します。
-
-    | 入力項目 | 入力する値 |
-    |:----|:----|
-    | **「セキュリティ・ポリシー」** | **「JDBC Over SSL」** を選択 |
-    | **「ウォレット」** | ![アップロード](images/btn_upload.png) （アップロード）ボタンをクリックして、ウォレット・ファイル `wallet_<DB名>.zip` をアップロード |
-    | **「ウォレット・パスワード」** | ウォレット・ファイルをダウンロードする際に指定したパスワードを入力 |
-    | **「データベース・サービス・ユーザー名」** | ADW インスタンスのユーザー名を入力 |
-    | **「パスワード」** | ADW インスタンスのユーザーのパスワードを入力 |
-
-    ![Oracle Integration Cloud](images/ss03-05.png)
-
-1.  **「接続プロパティ」** と **「セキュリティ」** の値を入力したら、ページの右上に表示されている **「テスト」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss03-06.png)
-
-    接続のテストに成功すると、 **「接続 *<接続名>* が正常にテストされました。」** というメッセージがページの右上に表示されます。
-
-1.  テストに成功したら、ページの右上に表示されている **「保存」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss03-07.png)
-
-    保存できたら、ページの左上にある **「<」** （戻る） アイコンをクリックして、**「接続」** ページに戻ります。
+* RESAS-API 呼び出すための REST アダプタを使用した接続: RESAS-API
+* Oracle ADB アダプタを使用した接続: ATP-01
 
 ## 統合の作成
 
@@ -265,7 +63,7 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 このチュートリアルで作成する統合は、次の処理を実行します。
 
 1. RESAS-API の市区町村 API を呼び出し、データを取得
-1. 取得したデータを Oracle ADW のテーブルに保存
+1. 取得したデータを Oracle ADB のテーブル `CITIES` に保存
 
 ### 統合の新規作成
 
@@ -454,15 +252,13 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 1.  これで、RESAS-API の市区町村一覧を取得するための設定が終わりました。
     ここまでの設定を保存するために、ページの右上に表示される **「保存」** ボタンをクリックします。
 
-### Oracle ADW へのデータの書き込み
+### Oracle ADB へのデータの書き込み
 
 1.  キャンバス・ビューの右端に表示されている ![呼び出し](images/btn_invokes.png) （呼び出し）アイコンをクリックします。
 
     ![Oracle Integration Cloud](images/ss06-01.png)
 
-    **「Oracle ADW」** をクリックして、『Oracle ADW アダプタを使用した接続』で作成した接続を見つけます。
-
-1.  『Oracle ADW アダプタを使用した接続』で作成した接続を、キャンバス・ビューの **「GetCities」** アイコンから **「停止」** アイコン（背景が緑色のアイコン）に向けられた矢印の上にドラッグし、表示された **「＋」** マークの上でドロップします。
+1.  接続を、キャンバス・ビューの **「GetCities」** アイコンから **「停止」** アイコン（背景が緑色のアイコン）に向けられた矢印の上にドラッグし、表示された **「＋」** マークの上でドロップします。
 
     ![Oracle Integration Cloud](images/ss06-02.png)
 
@@ -511,7 +307,7 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
 ### データ・マッピングの設定
 
-ここでは、RESAS-API により取得した市区町村一覧データと、Oracle ADW に保存するデータのマッピングの設定を行います。
+ここでは、RESAS-API により取得した市区町村一覧データと、Oracle ADB に保存するデータのマッピングの設定を行います。
 
 1.  キャンバス・ビューで、 **「マップ先 MergeCities」** を選択します。
     表示される **「編集」** アイコンをクリックします。
