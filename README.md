@@ -1,15 +1,15 @@
-# Oracle Integration Cloud チュートリアル: RESAS-API のデータを Oracle ADW に保存する
+# Oracle Integration Cloud チュートリアル: RESAS-API のデータを Oracle ADB に保存する
 
 2022年3月
 
-このチュートリアルは、 Oracle Integration Cloud を使用して [RESAS-API が提供する市区町村データ](https://opendata.resas-portal.go.jp/docs/api/v1/cities.html) を、Oracle ADW 上の `CITIES` という名前の表に保存してみます。
+このチュートリアルは、 Oracle Integration Cloud を使用して [RESAS-API が提供する市区町村データ](https://opendata.resas-portal.go.jp/docs/api/v1/cities.html) を、Oracle ADB 上の `CITIES` という名前の表に保存してみます。
 
 ## 前提
 
 このチュートリアルに沿って作業を進めるためには、次の設定が完了している必要があります。
 
 * Oracle Integration Cloud と Oracle Autononmous Database (ADB) のインスタンス作成
-* 市区町村データを格納する Oracle ADW の表の作成
+* 市区町村データを格納する Oracle ADB の表の作成
 * RESAS-API の API キーの取得
 
 ### インスタンスの作成
@@ -18,7 +18,7 @@
 まだインスタンスを作成していない場合は、次のページを参照してインスタンスを作成してください。
 
 * [Oracle Integration Cloud インスタンスの作成](https://oracle-japan.github.io/ocitutorials/integration/integration-for-commons-1-instance)
-* Oracle ADW インスタンスの作成
+* Oracle ADB インスタンスの作成
 
 ### 表の作成
 
@@ -298,11 +298,11 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
     ![Oracle Integration Cloud](images/ss06-07.png)
 
-    - **「マップ先 MergeCities」** は、 Oracle ADW に保存するデータのマッピングの設定を行います。
+    - **「マップ先 MergeCities」** は、 Oracle ADB に保存するデータのマッピングの設定を行います。
       次のセクションで設定します。
-    - **「MergeCities」** は、これまでに設定した Oracle ADW の呼び出しの設定です。
+    - **「MergeCities」** は、これまでに設定した Oracle ADB の呼び出しの設定です。
 
-1.  これで、RESAS-API の市区町村一覧のデータを Oracle ADW に保存するための設定が終わりました。
+1.  これで、RESAS-API の市区町村一覧のデータを Oracle ADB に保存するための設定が終わりました。
     ここまでの設定を保存するために、ページの右上に表示される **「保存」** ボタンをクリックします。
 
 ### データ・マッピングの設定
