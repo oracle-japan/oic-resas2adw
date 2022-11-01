@@ -1,6 +1,6 @@
 # Oracle Integration Cloud チュートリアル: RESAS-API のデータを Oracle ADB に保存する
 
-2022年3月
+2022年11月
 
 このチュートリアルは、 Oracle Integration Cloud を使用して [RESAS-API が提供する市区町村データ](https://opendata.resas-portal.go.jp/docs/api/v1/cities.html) を、Oracle ADB 上の `CITIES` という名前の表に保存してみます。
 
@@ -37,6 +37,8 @@
 RESAS-APIを利用するには API キーが必要です。
 API キーは、[利用登録](https://opendata.resas-portal.go.jp/form.html)することで取得できます。
 
+> ***Note*** このチュートリアルでは、あらかじめ取得した API キーを使用するので、利用登録は不要です。
+
 ### このチュートリアルの表記方法
 
 このチュートリアルで使用している表記方法は次のとおりです。
@@ -55,7 +57,7 @@ Oracle Integration Cloud は、多数のアダプタを提供しており、ア�
 このチュートリアルでは、作成済みの次の２つの接続を使用します。
 
 * RESAS-API 呼び出すための REST アダプタを使用した接続: RESAS-API
-* Oracle ADB アダプタを使用した接続: ATP-01
+* Oracle ADB アダプタを使用した接続: ATP_CONN
 
 ## 統合の作成
 
@@ -76,8 +78,8 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
     ![Oracle Integration Cloud](images/ss04-01.png)
 
-1.  **「統合スタイルの選択」** ボックスが表示されます。
-    **「スケジュールされたオーケストレーション」** をクリックしてから、ボックスの右下にある **「作成」** ボタンをクリックします。
+1.  **「統合スタイル」** ボックスが表示されます。
+    **「スケジュールされたオーケストレーション」** をクリックしてから、ボックスの右下にある **「選択」** ボタンをクリックします。
 
     ![Oracle Integration Cloud](images/ss04-02.png)
 
@@ -86,12 +88,13 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
     | 入力項目 | 入力する値 |
     |:----|:----|
-    | **「統合にどのような名前をつけますか。」** | `Load Cities` |
-    | **「識別子」** | `LOAD_CITIES` (Load Cities と名前をつけると自動的に設定される) |
+    | **「統合にどのような名前をつけますか。」** | `Load Cities <ユーザーのイニシャル>` |
+    | **「識別子」** | `LOAD_CITIES_<ユーザーのイニシャル>` (Load Cities と名前をつけると自動的に設定される) |
     | **「バージョン」** | `01.00.0000` （初期状態で入力されている値をそのまま使用） |
     | **「Documentation URL」** | 入力しない |
-    | **「この統合では何が行われますか。」** | 入力しない |
-    | **「Which keyword defines this integration」** | 入力しない |
+    | **「キーワード」** | 入力しない |
+    | **「パッケージ」** | 入力しない |
+    | **「説明」** | 実行される処理についての説明（任意） |
 
     ![Oracle Integration Cloud](images/ss04-03.png)
 
@@ -124,9 +127,9 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
     ![Oracle Integration Cloud](images/ss05-01.png)
 
     ロールが呼び出しに設定されている接続のリストが表示されます。
-    **「REST」** をクリックして、『RESAS-API 呼び出しのための REST アダプタ接続』で作成した接続を見つけます。
+    **「REST」** をクリックして、 **「RESAS-API」** を見つけます。
 
-1.  『RESAS-API 呼び出しのための REST アダプタ接続』で作成した接続を、キャンバス・ビューの **「スケジュール」** アイコンから **「停止」** アイコン（背景が緑色のアイコン）に向けられた矢印の上にドラッグし、表示された **「＋」** マークの上でドロップします。
+1.  **「RESAS-API」** を、キャンバス・ビューの **「スケジュール」** アイコンから **「停止」** アイコン（背景が緑色のアイコン）に向けられた矢印の上にドラッグし、表示された **「＋」** マークの上でドロップします。
 
     ![Oracle Integration Cloud](images/ss05-02.png)
 
@@ -188,16 +191,6 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
             "cityCode": "01103",
             "cityName": "札幌市東区",
             "bigCityFlag": "1"
-        }, {
-            "prefCode": 1,
-            "cityCode": "01104",
-            "cityName": "札幌市白石区",
-            "bigCityFlag": "1"
-        }, {
-            "prefCode": 1,
-            "cityCode": "01105",
-            "cityName": "札幌市豊平区",
-            "bigCityFlag": "1"
         }]
     }
     ```
@@ -229,25 +222,20 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
 1.  **「マップ先 GetCities」** ページが表示されます。
 
-    ページの左側に表示される **「Sources」** ツリーに **「$prefCode」** が表示されていることを確認します。
-    この **「$prefCode」** は、先ほど設定したスケジュール・パラメータです。
+    ページの左側に表示される **「Sources」** ツリーに **「prefCode」** が表示されていることを確認します。
+    この **「prefCode」** は、先ほど設定したスケジュール・パラメータです。
 
-    次に、ページの右側に表示されている **「Targets」** ツリーに **「execute」** → **「QueryParameters」** → **「prefCode」** が表示されていることを確認します。
-    この **「prefCode」** は、RESAS-API の市区町村一覧 API を呼び出す際に指定する問い合わせパラメータです。
+    次に、ページの右側に表示されている **「Targets」** ツリーに **「execute」** → **「QueryParameters」** → **「Pre fCode」** が表示されていることを確認します。
+    この **「Pref Code」** は、RESAS-API の市区町村一覧 API を呼び出す際に指定する問い合わせパラメータです。
 
-1.  **「Sources」** ツリーの **「$prefCode」** を、 **「Targets」** ツリーの **「prefCode」** の上にドラッグ＆ドロップします。
+1.  **「Sources」** ツリーの **「prefCode」** を、 **「Targets」** ツリーの **「Pref Code」** の上にドラッグ＆ドロップします。
 
     ![Oracle Integration Cloud](images/ss05-12.png)
 
     **「Sources」** ツリーの **「$prefCode」** を、 **「Targets」** ツリーの **「prefCode」** が直線で結ばれます。
 
 1.  ページの右上にある **「検証」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss05-13.png)
-
-1.  **「マッピングは有効で、使用する準備ができています。」** というメッセージが表示されたら、 **「閉じる」** ボタンをクリックします。
-
-    ![Oracle Integration Cloud](images/ss05-14.png)
+    **「マッピングは有効で、使用する準備ができています。」** というメッセージが表示されたら、 **「閉じる」** ボタンをクリックします。
 
 1.  これで、RESAS-API の市区町村一覧を取得するための設定が終わりました。
     ここまでの設定を保存するために、ページの右上に表示される **「保存」** ボタンをクリックします。
@@ -255,14 +243,15 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 ### Oracle ADB へのデータの書き込み
 
 1.  キャンバス・ビューの右端に表示されている ![呼び出し](images/btn_invokes.png) （呼び出し）アイコンをクリックします。
+    **「Oracle ATP」** の下をクリックすると **「ATP_CONN」** が表示されます。
 
     ![Oracle Integration Cloud](images/ss06-01.png)
 
-1.  接続を、キャンバス・ビューの **「GetCities」** アイコンから **「停止」** アイコン（背景が緑色のアイコン）に向けられた矢印の上にドラッグし、表示された **「＋」** マークの上でドロップします。
+1.  **「ATP_CONN」** を、キャンバス・ビューの **「GetCities」** アイコンから **「停止」** アイコン（背景が緑色のアイコン）に向けられた矢印の上にドラッグし、表示された **「＋」** マークの上でドロップします。
 
     ![Oracle Integration Cloud](images/ss06-02.png)
 
-1.  **「Oracle Adapter Configuration Wizard」** が表示されます。
+1.  **「Oracleアダプタ・エンドポイント構成ウィザード」** が表示されます。
     次のように **「基本情報」** を入力します。
 
     |入力項目|入力する値|
@@ -275,8 +264,8 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
     入力し終わったら、 **「次」** ボタンをクリックします。
 
-1.  **「Oracle Adapter Configuration Wizard」** の **「表での操作」** が表示されます。
-    **「スキーマ」** では、市区町村データを保存する `CITIES` 表のスキーマを選択し、 **「表タイプ」** では **「TABLE」** が選択されていることを確認したら、 **「表名」** フィールドの右隣にある **「検索」** ボタンをクリックします。
+1.  **「Oracleアダプタ・エンドポイント構成ウィザード」** の **「表での操作」** が表示されます。
+    **「スキーマ」** では、今回割り当てられたデータベース・ユーザー名を選択し、 **「表タイプ」** では **「TABLE」** が選択されていることを確認したら、 **「表名」** フィールドの右隣にある **「検索」** ボタンをクリックします。
 
     **「使用可能」** リストに **「CITIES」** が表示されています。
     **「CITIES」** を選択した状態で、 **「>」** ボタンをクリックします。
@@ -289,7 +278,7 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
 
     ![Oracle Integration Cloud](images/ss06-05.png)
 
-1.  **「Oracle Adapter Configuration Wizard」** の **「サマリー」** が表示されます。
+1.  **「Oracleアダプタ・エンドポイント構成ウィザード」** の **「サマリー」** が表示されます。
     ウィザードの右上にある **「完了」** ボタンをクリックします。
 
     ![Oracle Integration Cloud](images/ss06-06.png)
@@ -315,19 +304,19 @@ Oracle Integration Cloud の "統合" は、システム間の連携の流れを
     ![Oracle Integration Cloud](images/ss07-01.png)
 
 1.  データのマッピングの設定を行うためのマッパーが表示されます。
-    マッパーの画面左側に表示されている **「Sources」** ペインの **「$GetCities」** → **「executeResponse」** → **「response-wrapper」** → **「result」** を、画面右側に表示されている **「Target」** ペインの **「CitiesCollection」** → **「Cities」** にドラッグ＆ドロップします。
+    マッパーの画面左側に表示されている **「Sources」** ペインの **「GetCities Response (REST)」** → **「Execute Response」** → **「Response Wrapper」** → **「Result」** を、画面右側に表示されている **「Target」** ペインの **「MergeCities Request (Oracle ATP)」** → **「Cities」** にドラッグ＆ドロップします。
 
     ![Oracle Integration Cloud](images/ss07-03.png)
 
-1.  **「Sources」** ペインの **「prefCode」** を、 **「Target」** ペインの **「prefCode」** にドラッグ＆ドロップします。
+1.  **「Sources」** ペインの **「Pref Code」** を、 **「Target」** ペインの **「prefCode」** にドラッグ＆ドロップします。
 
     ![Oracle Integration Cloud](images/ss07-04.png)
 
-1.  **「Sources」** ペインの **「cityCode」** を、 **「Target」** ペインの **「cityCode」** にドラッグ＆ドロップします。
+1.  **「Sources」** ペインの **「City Code」** を、 **「Target」** ペインの **「cityCode」** にドラッグ＆ドロップします。
 
-1.  **「Sources」** ペインの **「cityName」** を、 **「Target」** ペインの **「cityName」** にドラッグ＆ドロップします。
+1.  **「Sources」** ペインの **「City Name」** を、 **「Target」** ペインの **「cityName」** にドラッグ＆ドロップします。
 
-1.  **「Sources」** ペインの **「bigCityFlag」** を、 **「Target」** ペインの **「bigCityFlag」** にドラッグ＆ドロップします。
+1.  **「Sources」** ペインの **「Big City Flag」** を、 **「Target」** ペインの **「bigCityFlag」** にドラッグ＆ドロップします。
 
     ![Oracle Integration Cloud](images/ss07-07.png)
 
@@ -384,6 +373,8 @@ Oracle Integration Cloud では、作成した統合が実行状況をトラッ�
 
     ![Oracle Integration Cloud](images/ss09-05.png)
 
+1.  **「すぐに送信」** ボックスが表示されたら、**「確認」** ボタンをクリックします。
+
 1.  **「スケジュール・パラメータ」** ページが表示されます。
     今回はデフォルト値をそのまま使用することにして、ページの右上にある **「送信」** ボタンをクリックします。
 
@@ -415,10 +406,6 @@ Oracle Integration Cloud では、作成した統合が実行状況をトラッ�
 
     ステータスが **「成功」** と表示されていることを確認します。
     インスタンスにマウス・ポインタを合わせると右側に表示される **「詳細の表示」** アイコンをクリックします。
-
-1.  ページの右上にある ![アクション](images/btn_actions.png) （アクション）アイコンをクリックし、表示されたメニューから **「アクティビティ・ストリーム」** を選択します。
-
-    ![Oracle Integration Cloud](images/ss09-14.png)
 
 1.  アクティビティ・ストリームが表示され、処理の流れが確認できます。
 
